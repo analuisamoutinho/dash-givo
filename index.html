@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Givo — Tráfego ao vivo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c111b; --panel:#131a28; --panel2:#182134; --line:#243049;
+    --text:#e8edf7; --dim:#8b98b3; --live:#3ddc84; --warn:#ffb454; --bad:#ff6b6b;
+    --accent:#6ea8ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ink);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh;padding:28px 32px}
+  h1,h2,.num{font-family:'Space Grotesk',sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand h1{font-size:22px;letter-spacing:.5px}
+  .brand span{color:var(--dim);font-size:13px}
+  .live{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--dim)}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--dim)}
+  .dot.on{background:var(--live);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,220,132,.55)}70%{box-shadow:0 0 0 10px rgba(61,220,132,0)}100%{box-shadow:0 0 0 0 rgba(61,220,132,0)}}
+  @media (prefers-reduced-motion: reduce){.dot.on{animation:none}}
+  .ring{position:relative;width:34px;height:34px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring circle{fill:none;stroke-width:3}
+  .ring .bg{stroke:var(--line)}
+  .ring .fg{stroke:var(--live);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+  .ring .sec{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--dim)}
+  .config{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:24px}
+  .config h2{font-size:15px;margin-bottom:12px}
+  .config .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:12px;color:var(--dim)}
+  input,select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit}
+  input:focus,select:focus,button:focus{outline:2px solid var(--accent);outline-offset:1px}
+  #token{width:340px}
+  button{background:var(--live);color:#06220f;border:0;border-radius:8px;padding:11px 20px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
+  button:hover{filter:brightness(1.08)}
+  .note{font-size:12px;color:var(--dim);margin-top:10px}
+  .note a{color:var(--accent)}
+  #status{font-size:13px;margin-top:10px;min-height:18px}
+  #status.err{color:var(--bad)} #status.ok{color:var(--live)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .card .lbl{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+  .card .num{font-size:28px;font-weight:700}
+  .card .sub{font-size:12px;color:var(--dim);margin-top:6px}
+  .split{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:24px}
+  @media(max-width:900px){.split{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .panel h2{font-size:15px;margin-bottom:14px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{color:var(--dim);text-align:left;font-weight:500;padding:8px 10px;border-bottom:1px solid var(--line)}
+  td{padding:9px 10px;border-bottom:1px solid var(--line)}
+  td.num{font-size:14px}
+  .tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--panel2);color:var(--dim)}
+  .tag.on{color:var(--live);background:rgba(61,220,132,.12)}
+  .empty{color:var(--dim);font-size:13px;padding:24px;text-align:center}
+  footer{color:var(--dim);font-size:12px;margin-top:8px}
+  .srcbadge{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;margin-left:10px;vertical-align:middle}
+  .srcbadge.meta{background:rgba(110,168,255,.15);color:var(--accent)}
+  .srcbadge.google{background:rgba(255,180,84,.15);color:var(--warn)}
+  .divider{height:1px;background:var(--line);margin:32px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>GIVO · Tráfego</h1>
+    <span id="periodLabel">últimos 7 dias + hoje</span>
+  </div>
+  <div class="live">
+    <span class="dot" id="dot"></span><span id="liveTxt">aguardando conexão</span>
+    <div class="ring" aria-hidden="true">
+      <svg width="34" height="34"><circle class="bg" cx="17" cy="17" r="14"></circle><circle class="fg" id="ringFg" cx="17" cy="17" r="14" stroke-dasharray="88" stroke-dashoffset="88"></circle></svg>
+      <span class="sec" id="ringSec">–</span>
+    </div>
+  </div>
+</header>
+
+<section class="config" id="configBox">
+  <h2>Conexão com a API do Meta</h2>
+  <div class="row">
+    <div class="field"><label for="token">Token de acesso (cole aqui — fica só nesta página, nunca é salvo)</label>
+      <input type="password" id="token" placeholder="EAAG..." autocomplete="off"></div>
+    <div class="field"><label for="acct">ID da conta de anúncios</label>
+      <input type="text" id="acct" value="3297699983735589" style="width:180px"></div>
+    <div class="field"><label for="intv">Atualizar a cada</label>
+      <select id="intv"><option value="30">30 s</option><option value="60" selected>60 s</option><option value="300">5 min</option></select></div>
+    <button id="connect">Conectar</button>
+  </div>
+  <p class="note">Gere o token em <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener">Graph API Explorer</a> com a permissão <b>ads_read</b> e estenda para 60 dias no <a href="https://developers.facebook.com/tools/debug/accesstoken/" target="_blank" rel="noopener">Access Token Debugger</a> (botão "Extend Access Token"). O token dá acesso de leitura à conta — não compartilhe.</p>
+  <p id="status"></p>
+</section>
+
+<div class="grid" id="kpis"></div>
+
+<div class="split">
+  <div class="panel"><h2>Investimento × Cliques — últimos 14 dias</h2><canvas id="trend" height="220" role="img" aria-label="Gráfico de investimento e cliques por dia"></canvas></div>
+  <div class="panel"><h2>Hoje</h2><div class="grid" style="grid-template-columns:1fr 1fr" id="today"></div></div>
+</div>
+
+<div class="panel">
+  <h2>Conjuntos de anúncios — últimos 7 dias</h2>
+  <div style="overflow-x:auto"><table>
+    <thead><tr><th>Conjunto</th><th>Status</th><th>Investido</th><th>Impressões</th><th>Cliques</th><th>CPC</th><th>CTR</th><th>Conversas/Leads</th></tr></thead>
+    <tbody id="adsets"><tr><td colspan="8" class="empty">Conecte o token para carregar os dados.</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="divider"></div>
+
+<section class="config" id="googleConfigBox">
+  <h2>Conexão com o Google Ads <span class="srcbadge google">via planilha</span></h2>
+  <div class="row">
+    <div class="field"><label for="gsheetId">ID da Google Sheet (vem da URL, entre /d/ e /edit)</label>
+      <input type="text" id="gsheetId" placeholder="1AbCDefGhIJkLmNoPQrsTUVwxyZ" style="width:340px"></div>
+    <div class="field"><label for="gintv">Atualizar a cada</label>
+      <select id="gintv"><option value="60">1 min</option><option value="300" selected>5 min</option><option value="900">15 min</option></select></div>
+    <button id="gconnect">Conectar Google Ads</button>
+  </div>
+  <p class="note">A planilha é alimentada 1x/dia por um Google Ads Script rodando dentro da própria conta de anúncios (arquivo <code>google_ads_script_givo.js</code>, ver instruções de instalação). Ela precisa estar compartilhada como <b>"Qualquer pessoa com o link → Leitor"</b>. Nenhuma credencial do Google Ads passa por este dashboard.</p>
+  <p id="gstatus"></p>
+</section>
+
+<div class="grid" id="gkpis"></div>
+
+<div class="split">
+  <div class="panel"><h2>Google Ads · Investimento × Cliques — últimos 14 dias</h2><canvas id="gtrend" height="220" role="img" aria-label="Gráfico de investimento e cliques do Google Ads por dia"></canvas></div>
+  <div class="panel"><h2>Google Ads · Hoje</h2><div class="grid" style="grid-template-columns:1fr 1fr" id="gtoday"></div></div>
+</div>
+
+<div class="panel">
+  <h2>Google Ads · Campanhas (dia mais recente na planilha)</h2>
+  <div style="overflow-x:auto"><table>
+    <thead><tr><th>Campanha</th><th>Status</th><th>Investido</th><th>Impressões</th><th>Cliques</th><th>CPC</th><th>CTR</th><th>Conversões</th></tr></thead>
+    <tbody id="gcampaigns"><tr><td colspan="8" class="empty">Conecte a planilha para carregar os dados.</td></tr></tbody>
+  </table></div>
+</div>
+<footer id="gLastUpdate"></footer>
+
+<script>
+const V='v21.0';
+let token='', acct='', timer=null, countdown=null, secsLeft=0, intervalSec=60, chart=null;
+const $=id=>document.getElementById(id);
+const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const int=n=>Number(n||0).toLocaleString('pt-BR');
+const pct=n=>Number(n||0).toLocaleString('pt-BR',{maximumFractionDigits:2})+'%';
+
+async function gapi(path,params){
+  const q=new URLSearchParams({...params,access_token:token});
+  const r=await fetch(`https://graph.facebook.com/${V}/${path}?${q}`);
+  const j=await r.json();
+  if(j.error) throw new Error(j.error.message||'Erro na API');
+  return j;
+}
+function setStatus(msg,cls){const s=$('status');s.textContent=msg;s.className=cls||'';}
+function kpiCard(lbl,val,sub){return `<div class="card"><div class="lbl">${lbl}</div><div class="num">${val}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`;}
+function actionsCount(actions){
+  if(!actions) return 0;
+  const keys=['onsite_conversion.messaging_conversation_started_7d','lead','offsite_conversion.fb_pixel_lead'];
+  return actions.filter(a=>keys.includes(a.action_type)).reduce((s,a)=>s+Number(a.value),0);
+}
+
+async function refresh(){
+  try{
+    setStatus('Atualizando…');
+    const base=`act_${acct}/insights`;
+    const [wk,today,series,adsets]=await Promise.all([
+      gapi(base,{date_preset:'last_7d',fields:'spend,impressions,clicks,cpc,ctr,reach,frequency'}),
+      gapi(base,{date_preset:'today',fields:'spend,impressions,clicks,cpc,ctr'}),
+      gapi(base,{date_preset:'last_14d',time_increment:1,fields:'spend,clicks'}),
+      gapi(base,{date_preset:'last_7d',level:'adset',fields:'adset_name,spend,impressions,clicks,cpc,ctr,actions',filtering:JSON.stringify([{field:'adset.effective_status',operator:'IN',value:['ACTIVE','PAUSED','CAMPAIGN_PAUSED']}])})
+    ]);
+    const w=wk.data[0]||{};
+    $('kpis').innerHTML=
+      kpiCard('Investido · 7d',brl(w.spend))+
+      kpiCard('Cliques · 7d',int(w.clicks))+
+      kpiCard('CPC · 7d',brl(w.cpc))+
+      kpiCard('CTR · 7d',pct(w.ctr))+
+      kpiCard('Alcance · 7d',int(w.reach),w.frequency?`frequência ${Number(w.frequency).toFixed(2)}`:'');
+    const t=today.data[0]||{};
+    $('today').innerHTML=
+      kpiCard('Investido',brl(t.spend))+kpiCard('Cliques',int(t.clicks))+
+      kpiCard('CPC',t.cpc?brl(t.cpc):'—')+kpiCard('CTR',t.ctr?pct(t.ctr):'—');
+    const labels=series.data.map(d=>d.date_start.slice(8,10)+'/'+d.date_start.slice(5,7));
+    const spend=series.data.map(d=>Number(d.spend||0));
+    const clicks=series.data.map(d=>Number(d.clicks||0));
+    if(chart) chart.destroy();
+    chart=new Chart($('trend'),{type:'line',data:{labels,datasets:[
+      {label:'Investido (R$)',data:spend,borderColor:'#3ddc84',backgroundColor:'rgba(61,220,132,.12)',fill:true,tension:.35,yAxisID:'y'},
+      {label:'Cliques',data:clicks,borderColor:'#6ea8ff',tension:.35,yAxisID:'y1'}]},
+      options:{responsive:true,plugins:{legend:{labels:{color:'#8b98b3'}}},
+      scales:{x:{ticks:{color:'#8b98b3'},grid:{color:'#243049'}},
+        y:{ticks:{color:'#3ddc84'},grid:{color:'#243049'}},
+        y1:{position:'right',ticks:{color:'#6ea8ff'},grid:{drawOnChartArea:false}}}}});
+    const rows=adsets.data.map(a=>`<tr><td>${a.adset_name}</td><td><span class="tag on">ativo/rodou</span></td>
+      <td class="num">${brl(a.spend)}</td><td class="num">${int(a.impressions)}</td><td class="num">${int(a.clicks)}</td>
+      <td class="num">${brl(a.cpc)}</td><td class="num">${pct(a.ctr)}</td><td class="num">${int(actionsCount(a.actions))}</td></tr>`).join('');
+    $('adsets').innerHTML=rows||'<tr><td colspan="8" class="empty">Sem veiculação nos últimos 7 dias.</td></tr>';
+    $('lastUpdate').textContent='Última atualização: '+new Date().toLocaleTimeString('pt-BR');
+    setStatus('Conectado ✓','ok'); $('dot').classList.add('on'); $('liveTxt').textContent='ao vivo';
+  }catch(e){
+    setStatus('Erro: '+e.message+(/expired|invalid/i.test(e.message)?' — gere um novo token no Graph API Explorer e estenda no Debugger.':''),'err');
+    $('dot').classList.remove('on'); $('liveTxt').textContent='desconectado';
+  }
+}
+function startCountdown(){
+  clearInterval(countdown); secsLeft=intervalSec;
+  countdown=setInterval(()=>{secsLeft--;
+    $('ringSec').textContent=secsLeft;
+    $('ringFg').style.strokeDashoffset=88*(1-secsLeft/intervalSec);
+    if(secsLeft<=0)secsLeft=intervalSec;},1000);
+}
+$('connect').addEventListener('click',()=>{
+  token=$('token').value.trim(); acct=$('acct').value.trim().replace(/^act_/,'');
+  intervalSec=Number($('intv').value);
+  if(!token||!acct){setStatus('Preencha token e ID da conta.','err');return;}
+  clearInterval(timer); refresh(); startCountdown();
+  timer=setInterval(refresh,intervalSec*1000);
+});
+
+// ===================== GOOGLE ADS (via Google Sheet) =====================
+let gSheetId='', gTimer=null, gChart=null;
+function setGStatus(msg,cls){const s=$('gstatus');s.textContent=msg;s.className=cls||'';}
+
+function csvUrl(sheetId,tabName){
+  return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
+}
+async function fetchSheetCsv(sheetId,tabName){
+  const r=await fetch(csvUrl(sheetId,tabName));
+  if(!r.ok) throw new Error(`Não consegui ler a aba "${tabName}" (${r.status}). Confira o compartilhamento e o nome da aba.`);
+  const text=await r.text();
+  if(/^<!DOCTYPE html|^<html/i.test(text.trim())) throw new Error(`A aba "${tabName}" não está acessível publicamente. Compartilhe a planilha como "Qualquer pessoa com o link".`);
+  const parsed=Papa.parse(text.trim(),{header:true,skipEmptyLines:true});
+  return parsed.data;
+}
+function toNum(v){ return Number(String(v??'0').replace(',','.'))||0; }
+
+async function refreshGoogle(){
+  try{
+    setGStatus('Atualizando…');
+    const [diario,campanhas]=await Promise.all([
+      fetchSheetCsv(gSheetId,'Diario'),
+      fetchSheetCsv(gSheetId,'Campanhas')
+    ]);
+    if(!diario.length) throw new Error('A aba "Diario" está vazia. O Google Ads Script já rodou pelo menos uma vez?');
+
+    const rows=diario.map(r=>({
+      data:r['Data'], investido:toNum(r['Investido']), impressoes:toNum(r['Impressoes']),
+      cliques:toNum(r['Cliques']), cpc:toNum(r['CPC']), ctr:toNum(r['CTR']), conversoes:toNum(r['Conversoes'])
+    })).sort((a,b)=>a.data.localeCompare(b.data));
+
+    const last14=rows.slice(-14);
+    const last7=rows.slice(-7);
+    const hoje=rows[rows.length-1]||{};
+    const sum7={investido:0,impressoes:0,cliques:0,conversoes:0};
+    last7.forEach(r=>{sum7.investido+=r.investido; sum7.impressoes+=r.impressoes; sum7.cliques+=r.cliques; sum7.conversoes+=r.conversoes;});
+    const cpc7=sum7.cliques>0?sum7.investido/sum7.cliques:0;
+    const ctr7=sum7.impressoes>0?(sum7.cliques/sum7.impressoes*100):0;
+
+    $('gkpis').innerHTML=
+      kpiCard('Investido · 7d',brl(sum7.investido))+
+      kpiCard('Cliques · 7d',int(sum7.cliques))+
+      kpiCard('CPC · 7d',brl(cpc7))+
+      kpiCard('CTR · 7d',pct(ctr7))+
+      kpiCard('Conversões · 7d',int(sum7.conversoes));
+
+    $('gtoday').innerHTML=
+      kpiCard('Investido',brl(hoje.investido))+kpiCard('Cliques',int(hoje.cliques))+
+      kpiCard('CPC',brl(hoje.cpc))+kpiCard('CTR',pct(hoje.ctr));
+
+    const labels=last14.map(r=>{const [y,m,d]=r.data.split('-'); return `${d}/${m}`;});
+    if(gChart) gChart.destroy();
+    gChart=new Chart($('gtrend'),{type:'line',data:{labels,datasets:[
+      {label:'Investido (R$)',data:last14.map(r=>r.investido),borderColor:'#ffb454',backgroundColor:'rgba(255,180,84,.12)',fill:true,tension:.35,yAxisID:'y'},
+      {label:'Cliques',data:last14.map(r=>r.cliques),borderColor:'#6ea8ff',tension:.35,yAxisID:'y1'}]},
+      options:{responsive:true,plugins:{legend:{labels:{color:'#8b98b3'}}},
+      scales:{x:{ticks:{color:'#8b98b3'},grid:{color:'#243049'}},
+        y:{ticks:{color:'#ffb454'},grid:{color:'#243049'}},
+        y1:{position:'right',ticks:{color:'#6ea8ff'},grid:{drawOnChartArea:false}}}}});
+
+    const campRows=campanhas.map(r=>({
+      data:r['Data'], nome:r['Campanha'], status:r['Status'],
+      investido:toNum(r['Investido']), impressoes:toNum(r['Impressoes']), cliques:toNum(r['Cliques']),
+      cpc:toNum(r['CPC']), ctr:toNum(r['CTR']), conversoes:toNum(r['Conversoes'])
+    }));
+    const ultimaData=campRows.length?campRows.map(r=>r.data).sort().slice(-1)[0]:null;
+    const doDia=campRows.filter(r=>r.data===ultimaData);
+    const tagClass=s=>/enabled|ativ/i.test(s||'')?'tag on':'tag';
+    const rowsHtml=doDia.map(c=>`<tr><td>${c.nome}</td><td><span class="${tagClass(c.status)}">${c.status||'—'}</span></td>
+      <td class="num">${brl(c.investido)}</td><td class="num">${int(c.impressoes)}</td><td class="num">${int(c.cliques)}</td>
+      <td class="num">${brl(c.cpc)}</td><td class="num">${pct(c.ctr)}</td><td class="num">${int(c.conversoes)}</td></tr>`).join('');
+    $('gcampaigns').innerHTML=rowsHtml||'<tr><td colspan="8" class="empty">Sem campanhas na aba para a data mais recente.</td></tr>';
+
+    $('gLastUpdate').textContent='Google Ads — última leitura da planilha: '+new Date().toLocaleTimeString('pt-BR')+' (dado do dia '+(hoje.data||'—')+')';
+    setGStatus('Conectado ✓','ok');
+  }catch(e){
+    setGStatus('Erro: '+e.message,'err');
+  }
+}
+$('gconnect').addEventListener('click',()=>{
+  gSheetId=$('gsheetId').value.trim();
+  const gIntervalSec=Number($('gintv').value);
+  if(!gSheetId){setGStatus('Cole o ID da planilha.','err');return;}
+  clearInterval(gTimer); refreshGoogle();
+  gTimer=setInterval(refreshGoogle,gIntervalSec*1000);
+});
+
+</script>
+</body>
+</html>
