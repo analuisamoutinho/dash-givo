@@ -5,9 +5,12 @@
  * (Ferramentas e configurações → Ações em massa → Scripts → + novo script)
  *
  * O QUE FAZ:
- * 1. Pega os números da conta e de cada campanha do dia (roda 1x/dia via agendamento).
- * 2. Escreve/atualiza uma linha por dia nas abas "Diario" e "Campanhas" da planilha.
+ * 1. Pega os números da conta, de cada campanha e de cada anúncio do dia
+ *    (roda 1x/dia, ou de hora em hora, via agendamento).
+ * 2. Escreve/atualiza uma linha por dia nas abas "Diario", "Campanhas" e
+ *    "Anuncios" da planilha.
  * 3. Nunca duplica: se já existe uma linha para o dia, ela é atualizada, não duplicada.
+ * 4. Campanhas e anúncios sem nenhuma impressão no dia não entram na planilha.
  *
  * PASSO A PASSO PRA INSTALAR:
  * 1. Crie uma Google Sheet nova (sheets.google.com → planilha em branco).
@@ -22,8 +25,8 @@
  *    → Scripts → clique em "+" → apague o conteúdo de exemplo → cole este arquivo inteiro.
  * 6. Clique em "Visualizar" (Preview) — na primeira vez ele vai pedir autorização
  *    (permissão pra acessar a conta de anúncios e o Google Sheets). Autorize.
- * 7. Depois de rodar sem erro, clique em "Agendamento" (Schedule) → Diariamente,
- *    de madrugada (ex: 06:00, horário da conta) → Salvar.
+ * 7. Depois de rodar sem erro, clique em "Agendamento" (Schedule) → escolha a frequência
+ *    (Diariamente ou De hora em hora) → Salvar.
  * 8. Pegue o ID da planilha (a parte entre /d/ e /edit na URL) e cole no dashboard,
  *    no campo "ID da Google Sheet".
  */
@@ -42,6 +45,7 @@ function main() {
 
   exportarResumoConta(ss, today);
   exportarPorCampanha(ss, today);
+  exportarPorAnuncio(ss, today);
 
   Logger.log('Exportação concluída para ' + today);
 }
@@ -94,10 +98,52 @@ function exportarPorCampanha(ss, today) {
   while (rows.hasNext()) {
     var row = rows.next();
     var c = row.campaign, m = row.metrics;
+    if (m.impressions < 1) continue; // sem veiculação no dia — não entra na planilha
+
     toAppend.push([
       today,
       c.name,
       c.status,
+      m.costMicros / 1e6,
+      m.impressions,
+      m.clicks,
+      m.averageCpc / 1e6,
+      m.ctr * 100,
+      m.conversions
+    ]);
+  }
+
+  if (toAppend.length > 0) {
+    sheet.getRange(sheet.getLastRow() + 1, 1, toAppend.length, toAppend[0].length).setValues(toAppend);
+  }
+}
+
+function exportarPorAnuncio(ss, today) {
+  var sheet = ss.getSheetByName('Anuncios') || ss.insertSheet('Anuncios');
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Data', 'Campanha', 'Grupo de anuncios', 'Status', 'Investido', 'Impressoes', 'Cliques', 'CPC', 'CTR', 'Conversoes']);
+  }
+
+  removerLinhasDoDia(sheet, today);
+
+  var query =
+    "SELECT campaign.name, ad_group.name, ad_group_ad.status, metrics.cost_micros, " +
+    "metrics.impressions, metrics.clicks, metrics.average_cpc, metrics.ctr, metrics.conversions " +
+    "FROM ad_group_ad WHERE segments.date = '" + today + "'";
+
+  var rows = AdsApp.search(query);
+  var toAppend = [];
+
+  while (rows.hasNext()) {
+    var row = rows.next();
+    var m = row.metrics;
+    if (m.impressions < 1) continue; // sem veiculação no dia — não entra na planilha
+
+    toAppend.push([
+      today,
+      row.campaign.name,
+      row.adGroup.name,
+      row.adGroupAd.status,
       m.costMicros / 1e6,
       m.impressions,
       m.clicks,
