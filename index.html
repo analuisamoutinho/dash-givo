@@ -69,6 +69,21 @@
   #status,#gstatus{font-size:12.5px;margin-top:2px;font-weight:600;min-height:16px}
   #status.err,#gstatus.err{color:var(--bad)}
 
+  /* ---- detalhamento de público (breakdowns Meta) ---- */
+  .subhead{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:6px 0 16px;padding-top:20px;border-top:1px solid var(--line)}
+  .subhead h3{font-size:15px;color:var(--dim);font-weight:700;font-family:var(--font-serif)}
+  .subhead p{font-size:12px;color:var(--muted);margin-top:2px}
+  .metric-select{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted)}
+  .metric-select select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 10px;font:600 12.5px var(--font-sans);cursor:pointer}
+  .metric-select select:focus{outline:2px solid var(--rosa-400);outline-offset:1px}
+  .split-3{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:18px;align-items:stretch}
+  @media(max-width:900px){.split-3{grid-template-columns:1fr}}
+  .chartbox{position:relative;height:240px}
+  .panel .panel-note{font-size:11px;color:var(--muted);margin-top:10px}
+  /* barra dentro das células de tabela (share visual) */
+  td .bar{display:block;height:5px;border-radius:3px;background:var(--rosa-400);margin-top:5px;min-width:2px}
+  .plat-tag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:20px;background:var(--rosa-100);color:var(--rosa-700);margin-right:6px}
+
   footer{color:var(--muted);font-size:11.5px;margin-top:6px}
   .divider{height:1px;background:var(--line);margin:6px 0 22px}
 
@@ -251,6 +266,59 @@
       </table></div>
     </div>
   </div>
+
+  <!-- ---------- Detalhamento do público e posicionamento (breakdowns Meta) ---------- -->
+  <div class="subhead">
+    <div>
+      <h3>Detalhamento do público e posicionamento</h3>
+      <p>Idade, gênero, posicionamento, dispositivo e região — direto da API do Meta, no período selecionado.</p>
+    </div>
+    <div class="metric-select">
+      <label for="mMetric">Métrica</label>
+      <select id="mMetric">
+        <option value="impressions">Impressões</option>
+        <option value="clicks">Cliques</option>
+        <option value="spend">Investimento</option>
+        <option value="conversions">Conversões</option>
+        <option value="reach">Alcance</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="split-3">
+    <div class="panel">
+      <h3>Idade × gênero</h3>
+      <div class="chartbox"><canvas id="mAge" role="img" aria-label="Distribuição por faixa etária e gênero"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Gênero</h3>
+      <div class="chartbox"><canvas id="mGender" role="img" aria-label="Distribuição por gênero"></canvas></div>
+    </div>
+  </div>
+
+  <div class="split-3">
+    <div class="panel">
+      <h3>Posicionamento (placement)</h3>
+      <div style="overflow-x:auto"><table>
+        <thead><tr><th>Plataforma · posição</th><th class="num">Investido</th><th class="num">Impr.</th><th class="num">CTR</th><th class="num">Conv.</th></tr></thead>
+        <tbody id="mPlacements"><tr><td colspan="5" class="empty">Carregando dados…</td></tr></tbody>
+      </table></div>
+    </div>
+    <div class="panel">
+      <h3>Dispositivo</h3>
+      <div class="chartbox"><canvas id="mDevice" role="img" aria-label="Distribuição por dispositivo"></canvas></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:0">
+    <h3>Regiões com mais veiculação</h3>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Região</th><th class="num">Impressões</th><th class="num">Cliques</th><th class="num">Investido</th><th class="num">CTR</th><th class="num">Conv.</th></tr></thead>
+      <tbody id="mRegions"><tr><td colspan="6" class="empty">Carregando dados…</td></tr></tbody>
+    </table></div>
+    <p class="panel-note">Os detalhamentos por idade, gênero, posicionamento, dispositivo e região dependem das permissões do token do Meta. Quando algum recorte não estiver disponível, ele aparece vazio sem afetar o resto do painel.</p>
+  </div>
+
   <p id="status"></p>
   <footer id="lastUpdate"></footer>
 </section>
@@ -470,6 +538,7 @@ function kpiCard(lbl,val,sub){return `<div class="card"><div class="lbl">${lbl}<
 
 // ===================== FILTRO DE DATA (controla os dois canais) =====================
 let since, until, chart=null, gChart=null, metaTimer=null, googleTimer=null;
+let ageChart=null, genderChart=null, deviceChart=null, lastMeta=null;
 
 function applyPreset(preset){
   const now = new Date();
@@ -537,12 +606,115 @@ async function refreshMeta(){
       <td class="num">${int(a.conversions)}</td><td class="num">${a.conversions>0?brl(a.spend/a.conversions):'—'}</td></tr>`).join('');
     $('ads').innerHTML=rows||'<tr><td colspan="3" class="empty">Sem veiculação no período selecionado.</td></tr>';
 
+    lastMeta=data;
+    renderMetaBreakdowns(data);
+
     $('lastUpdate').textContent='Meta Ads — atualizado às '+new Date().toLocaleTimeString('pt-BR');
     setStatus('','');
   }catch(e){
     setStatus('Erro: '+e.message,'err');
   }
 }
+
+// ---- Detalhamento de público e posicionamento (breakdowns Meta) ----
+const METRIC_LABELS={impressions:'Impressões',clicks:'Cliques',spend:'Investimento',conversions:'Conversões',reach:'Alcance'};
+const AGE_ORDER=['13-17','18-24','25-34','35-44','45-54','55-64','65+','unknown'];
+const GENDER_META={female:{label:'Feminino',color:'#F52B5F'},male:{label:'Masculino',color:'#5B4B4E'},unknown:{label:'Não identificado',color:'#C9AEB5'}};
+const DONUT_COLORS=['#F52B5F','#5B4B4E','#F7A8C0','#AD0F47','#C9AEB5','#8C7A7E','#FCE9EE'];
+const fmtMetric=(v,m)=> m==='spend'?brl(v):int(v);
+const platLabel=s=>({facebook:'Facebook',instagram:'Instagram',messenger:'Messenger',audience_network:'Audience Network',unknown:'—'}[s]||s);
+const posLabel=s=>String(s||'—').replace(/_/g,' ');
+const emptyRow=(cols,msg)=>`<tr><td colspan="${cols}" class="empty">${msg}</td></tr>`;
+
+const donutOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#5B4B4E',font:{family:'Inter',size:11},boxWidth:12,padding:10}}}};
+
+function renderMetaBreakdowns(data){
+  const metric=$('mMetric').value;
+  renderAgeGender(data.demographics||[], metric);
+  renderGender(data.demographics||[], metric);
+  renderDevice(data.devices||[], metric);
+  renderPlacements(data.placements||[]);
+  renderRegions(data.regions||[]);
+}
+
+function renderAgeGender(demo, metric){
+  const ages=AGE_ORDER.filter(a=>demo.some(d=>d.age===a));
+  const labels=ages.map(a=>a==='unknown'?'—':a);
+  const genders=[...new Set(demo.map(d=>d.gender))].sort();
+  const datasets=genders.map(g=>{
+    const gm=GENDER_META[g]||{label:g,color:'#C9AEB5'};
+    return {label:gm.label,backgroundColor:gm.color,borderRadius:4,
+      data:ages.map(a=>demo.filter(d=>d.age===a&&d.gender===g).reduce((s,d)=>s+(d[metric]||0),0))};
+  });
+  if(ageChart) ageChart.destroy();
+  if(!demo.length){ return; }
+  ageChart=new Chart($('mAge'),{type:'bar',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#5B4B4E',font:{family:'Inter',size:11}}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmtMetric(c.parsed.y,metric)}`}}},
+      scales:{x:{stacked:true,ticks:{color:'#8C7A7E'},grid:{display:false}},
+        y:{stacked:true,ticks:{color:'#8C7A7E'},grid:{color:'#EFDEE3'}}}}});
+}
+
+function renderGender(demo, metric){
+  const map=new Map();
+  demo.forEach(d=>map.set(d.gender,(map.get(d.gender)||0)+(d[metric]||0)));
+  const entries=[...map.entries()].filter(([,v])=>v>0);
+  if(genderChart) genderChart.destroy();
+  if(!entries.length){ return; }
+  genderChart=new Chart($('mGender'),{type:'doughnut',
+    data:{labels:entries.map(([g])=>(GENDER_META[g]||{label:g}).label),
+      datasets:[{data:entries.map(([,v])=>v),
+        backgroundColor:entries.map(([g])=>(GENDER_META[g]||{color:'#C9AEB5'}).color),borderWidth:0}]},
+    options:{...donutOpts,cutout:'62%',plugins:{...donutOpts.plugins,
+      tooltip:{callbacks:{label:c=>`${c.label}: ${fmtMetric(c.parsed,metric)}`}}}}});
+}
+
+function renderDevice(devices, metric){
+  const rows=devices.filter(d=>(d[metric]||0)>0).sort((a,b)=>(b[metric]||0)-(a[metric]||0));
+  if(deviceChart) deviceChart.destroy();
+  if(!rows.length){ return; }
+  deviceChart=new Chart($('mDevice'),{type:'doughnut',
+    data:{labels:rows.map(d=>posLabel(d.device)),
+      datasets:[{data:rows.map(d=>d[metric]||0),
+        backgroundColor:rows.map((_,i)=>DONUT_COLORS[i%DONUT_COLORS.length]),borderWidth:0}]},
+    options:{...donutOpts,cutout:'62%',plugins:{...donutOpts.plugins,
+      tooltip:{callbacks:{label:c=>`${c.label}: ${fmtMetric(c.parsed,metric)}`}}}}});
+}
+
+function renderPlacements(placements){
+  const map=new Map();
+  placements.forEach(p=>{
+    const key=p.publisher_platform+'||'+p.platform_position;
+    if(!map.has(key)) map.set(key,{spend:0,impressions:0,clicks:0,conversions:0});
+    const g=map.get(key); g.spend+=p.spend; g.impressions+=p.impressions; g.clicks+=p.clicks; g.conversions+=p.conversions;
+  });
+  const list=[...map.entries()].map(([key,g])=>{const [plat,pos]=key.split('||');
+    return {plat,pos,...g,ctr:g.impressions>0?g.clicks/g.impressions*100:0};})
+    .filter(g=>g.impressions>=1).sort((a,b)=>b.spend-a.spend);
+  const maxSpend=Math.max(1,...list.map(g=>g.spend));
+  $('mPlacements').innerHTML=list.map(g=>`<tr>
+    <td class="name"><span class="plat-tag">${platLabel(g.plat)}</span>${posLabel(g.pos)}
+      <span class="bar" style="width:${Math.max(6,g.spend/maxSpend*100)}%"></span></td>
+    <td class="num">${brl(g.spend)}</td><td class="num">${int(g.impressions)}</td>
+    <td class="num">${pct(g.ctr)}</td><td class="num">${int(g.conversions)}</td></tr>`).join('')
+    || emptyRow(5,'Sem detalhamento de posicionamento no período.');
+}
+
+function renderRegions(regions){
+  const list=(regions||[]).map(r=>({...r,ctr:r.impressions>0?r.clicks/r.impressions*100:0}));
+  $('mRegions').innerHTML=list.map(r=>`<tr>
+    <td class="name">${r.region}</td>
+    <td class="num">${int(r.impressions)}</td><td class="num">${int(r.clicks)}</td>
+    <td class="num">${brl(r.spend)}</td><td class="num">${pct(r.ctr)}</td>
+    <td class="num">${int(r.conversions)}</td></tr>`).join('')
+    || emptyRow(6,'Sem detalhamento por região no período.');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const sel=$('mMetric');
+  if(sel) sel.addEventListener('change',()=>{ if(lastMeta) renderMetaBreakdowns(lastMeta); });
+});
 
 // ===================== GOOGLE ADS (via Google Sheet) =====================
 function setGStatus(msg,cls){const s=$('gstatus');s.textContent=msg;s.className=cls||'';}
