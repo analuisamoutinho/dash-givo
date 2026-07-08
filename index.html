@@ -142,25 +142,28 @@
   .cal-post.status-publicado{border-left-color:var(--good)}
 
   /* ---- trends ---- */
-  .trends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-  .trend-card{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
-  .trend-card.urg-alta{border-left-color:var(--rosa-400)}
-  .trend-card.urg-media{border-left-color:#e0a021}
-  .trend-card.urg-baixa{border-left-color:var(--good)}
-  .trend-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-  .trend-termo{font-family:var(--font-serif);font-weight:700;font-size:15.5px;line-height:1.2}
-  .trend-volume{font-size:11.5px;color:var(--muted);margin-top:3px}
-  .trend-badges{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0;justify-content:flex-end}
+  .trends-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:stretch}
+  @media(max-width:1200px){.trends-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:680px){.trends-grid{grid-template-columns:1fr}}
+  .trend-card{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--line);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:11px;height:100%;box-shadow:0 1px 3px rgba(17,10,12,.03)}
+  .trend-card.urg-alta{border-top-color:var(--rosa-400)}
+  .trend-card.urg-media{border-top-color:#e0a021}
+  .trend-card.urg-baixa{border-top-color:var(--good)}
+  .trend-head{display:flex;flex-direction:column;gap:6px}
+  .trend-termo{font-family:var(--font-serif);font-weight:700;font-size:15.5px;line-height:1.25;min-height:2.5em}
+  .trend-volume{font-size:11.5px;color:var(--muted)}
+  .trend-badges{display:flex;gap:5px;flex-wrap:wrap}
   .tbadge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
   .tbadge.fonte{background:var(--panel2);color:var(--dim)}
-  .tbadge.tipo{background:var(--panel2);color:var(--dim)}
+  .tbadge.tipo{background:var(--panel2);color:var(--dim);text-transform:capitalize}
   .tbadge.urg-alta{background:var(--rosa-100);color:var(--rosa-700)}
   .tbadge.urg-media{background:#FBF0D9;color:#8a6516}
   .tbadge.urg-baixa{background:#E2F6E2;color:#0ca30c}
   .trend-relev{font-size:12.5px;color:var(--dim);line-height:1.5}
-  .trend-gancho{background:var(--rosa-100);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:600;font-style:italic;color:var(--rosa-700);line-height:1.4}
+  .trend-gancho{background:var(--rosa-100);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;font-style:italic;color:var(--rosa-700);line-height:1.45}
   .trend-angulo{font-size:12.5px;color:var(--text);line-height:1.5}
-  .trend-actions{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap}
+  .trend-actions{display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:4px}
+  .trend-actions .btn-primary,.trend-actions .btn-secondary{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:6px;text-align:center}
   .trends-meta{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
   .trends-updated{font-size:12px;color:var(--muted);margin-left:auto}
 
@@ -986,7 +989,7 @@ async function loadTrends(refresh){
     const trends=data.trends||[];
     if(!trends.length){ $('trendsEmpty').textContent='Nenhuma tendência disponível.'; grid.innerHTML=''; return; }
     $('trendsEmpty').style.display='none';
-    grid.innerHTML=trends.map(t=>trendCard(t)).join('');
+    grid.innerHTML=trends.slice(0,4).map(t=>trendCard(t)).join('');
     grid.querySelectorAll('[data-usar]').forEach(el=>el.addEventListener('click',()=>usarComoPauta(JSON.parse(el.dataset.usar))));
     grid.querySelectorAll('[data-gancho]').forEach(el=>el.addEventListener('click',()=>{ navigator.clipboard.writeText(el.dataset.gancho).then(()=>toast('Gancho copiado!','success')); }));
     if(data.updatedAt){ const dt=new Date(data.updatedAt); $('trendsUpdated').textContent='Atualizado às '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
@@ -1003,11 +1006,9 @@ function trendCard(t){
   const urgLabel={alta:'🔥 Alta',media:'⚡ Média',baixa:'🌱 Baixa'}[urg]||t.urgencia||'';
   const tipoIcon={carrossel:'🎠',post:'🖼️',reels:'🎬'}[(t.tipo_ideal||'').toLowerCase()]||'📄';
   return `<div class="trend-card urg-${urg}">
-    <div class="trend-top">
-      <div>
-        <div class="trend-termo">${escapeHtml(t.termo||'')}</div>
-        ${t.volume?`<div class="trend-volume">${escapeHtml(t.volume)}</div>`:''}
-      </div>
+    <div class="trend-head">
+      <div class="trend-termo">${escapeHtml(t.termo||'')}</div>
+      ${t.volume?`<div class="trend-volume">${escapeHtml(t.volume)}</div>`:''}
       <div class="trend-badges">
         <span class="tbadge fonte">${escapeHtml(t.fonte||'Nicho RH')}</span>
         <span class="tbadge urg-${urg}">${urgLabel}</span>
@@ -1028,10 +1029,21 @@ function usarComoPauta(t){
   const fmtMap={carrossel:'Carrossel',post:'Post único',reels:'Reels'};
   const fmt=fmtMap[(t.tipo_ideal||'').toLowerCase()];
   if(fmt) $('cmFormato').value=fmt;
-  $('cmTema').value=t.gancho||t.termo||'';
+  // Envia o CONTEXTO COMPLETO da tendência, para o conteúdo seguir a mesma linha
+  const brief=[
+    `Tendência do nicho: ${t.termo||''}`,
+    t.volume?`Momento/volume: ${t.volume}`:'',
+    t.gancho?`Gancho de referência: "${t.gancho}"`:'',
+    t.angulo?`Ângulo a desenvolver: ${t.angulo}`:'',
+    t.relevancia?`Por que é relevante para a Givo: ${t.relevancia}`:'',
+    t.tipo_ideal?`Formato ideal: ${t.tipo_ideal}`:'',
+    'Desenvolva o conteúdo mantendo a mesma linha e o mesmo ângulo desta tendência.',
+  ].filter(Boolean).join('\n');
+  $('cmTema').value=brief;
   document.querySelector('.fold').scrollIntoView({behavior:'smooth',block:'start'});
   $('cmTema').focus();
-  toast('Pauta enviada para o gerador de conteúdo','info');
+  $('cmTema').setSelectionRange(0,0);
+  toast('Pauta completa enviada para o gerador de conteúdo','info');
 }
 
 $('trendsRefresh').addEventListener('click', ()=>loadTrends(true));
