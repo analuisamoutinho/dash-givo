@@ -31,6 +31,36 @@ function toISO(d) {
   return d.toISOString().slice(0, 10);
 }
 
+// Normaliza uma linha de insight com breakdown para as métricas que o painel usa.
+function normalizeRow(d) {
+  return {
+    spend: Number(d.spend || 0),
+    impressions: Number(d.impressions || 0),
+    clicks: Number(d.clicks || 0),
+    reach: Number(d.reach || 0),
+    ctr: Number(d.ctr || 0),
+    cpc: Number(d.cpc || 0),
+    conversions: actionsCount(d.actions),
+  };
+}
+
+// Busca insights com breakdowns (idade, gênero, posicionamento, dispositivo…).
+// É resiliente: se o token não tiver permissão ou a combinação não for aceita,
+// devolve lista vazia em vez de derrubar o painel inteiro.
+async function fetchBreakdown(base, timeRange, breakdowns) {
+  try {
+    const json = await metaFetch(base, {
+      time_range: timeRange,
+      breakdowns,
+      fields: 'spend,impressions,clicks,ctr,cpc,reach,actions',
+      limit: 1000,
+    });
+    return json.data || [];
+  } catch {
+    return [];
+  }
+}
+
 module.exports = async function handler(req, res) {
   try {
     const acct = process.env.META_AD_ACCOUNT_ID;
@@ -44,7 +74,7 @@ module.exports = async function handler(req, res) {
     const timeRange = JSON.stringify({ since, until });
 
     const base = `act_${acct}/insights`;
-    const [summary, series, ads] = await Promise.all([
+    const [summary, series, ads, demoRaw, placeRaw, deviceRaw, regionRaw] = await Promise.all([
       metaFetch(base, { time_range: timeRange, fields: 'spend,impressions,clicks,cpc,ctr,reach,frequency' }),
       metaFetch(base, { time_range: timeRange, time_increment: 1, fields: 'spend,clicks' }),
       metaFetch(base, {
@@ -53,6 +83,11 @@ module.exports = async function handler(req, res) {
         fields: 'ad_name,adset_name,spend,impressions,clicks,cpc,ctr,actions',
         limit: 500,
       }),
+      // Breakdowns da API do Meta — cada um resiliente a falhas.
+      fetchBreakdown(base, timeRange, 'age,gender'),
+      fetchBreakdown(base, timeRange, 'publisher_platform,platform_position'),
+      fetchBreakdown(base, timeRange, 'impression_device'),
+      fetchBreakdown(base, timeRange, 'region'),
     ]);
 
     const adsList = (ads.data || [])
@@ -70,12 +105,29 @@ module.exports = async function handler(req, res) {
       .sort((x, y) => y.conversions - x.conversions || y.spend - x.spend)
       .slice(0, 20);
 
+    const demographics = demoRaw.map(d => ({ age: d.age || '—', gender: d.gender || 'unknown', ...normalizeRow(d) }));
+    const placements = placeRaw.map(d => ({
+      publisher_platform: d.publisher_platform || '—',
+      platform_position: d.platform_position || '—',
+      ...normalizeRow(d),
+    }));
+    const devices = deviceRaw.map(d => ({ device: d.impression_device || '—', ...normalizeRow(d) }));
+    const regions = regionRaw
+      .map(d => ({ region: d.region || '—', ...normalizeRow(d) }))
+      .filter(r => r.impressions >= 1)
+      .sort((a, b) => b.impressions - a.impressions)
+      .slice(0, 12);
+
     res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
     res.status(200).json({
       range: { since, until },
       summary: summary.data[0] || {},
       series: series.data.map(d => ({ date: d.date_start, spend: Number(d.spend || 0), clicks: Number(d.clicks || 0) })),
       ads: adsList,
+      demographics,
+      placements,
+      devices,
+      regions,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
