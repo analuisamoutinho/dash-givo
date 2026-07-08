@@ -113,19 +113,88 @@
   .prio-media{color:#c78a1f;font-weight:700}
   .prio-baixa{color:var(--muted);font-weight:600}
   .sheet-note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.5}
+
+  /* ---- content folds ---- */
+  .fold{margin-bottom:26px}
+  .fold-head{display:flex;align-items:baseline;gap:12px;margin:0 2px 14px}
+  .fold-num{font-family:var(--font-sans);font-weight:700;font-size:12px;color:#fff;background:var(--rosa-400);border-radius:999px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+  .fold-head h2{font-size:19px}
+  .fold-head p{font-size:12.5px;color:var(--dim);margin-top:2px;font-family:var(--font-sans)}
+  .btn-secondary{background:var(--panel2);color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:11px 20px;font:700 13.5px var(--font-sans);cursor:pointer}
+  .btn-secondary:hover{background:var(--rosa-100);color:var(--rosa-700)}
+  .btn-secondary:disabled{opacity:.5;cursor:default}
+  .btn-sm{padding:8px 14px;font-size:12.5px}
+
+  /* ---- calendar ---- */
+  .cal-controls{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+  .cal-controls .field{margin:0}
+  .cal-legend{display:flex;gap:8px;flex-wrap:wrap}
+  .cal-week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+  @media(max-width:900px){.cal-week-grid{grid-template-columns:repeat(2,1fr)}}
+  .cal-daycol{display:flex;flex-direction:column;gap:8px;min-width:0}
+  .cal-dayhead{font-size:12px;font-weight:700;color:var(--dim)}
+  .cal-dayhead span{display:block;font-weight:400;color:var(--muted);font-size:11px;margin-top:1px}
+  .cal-post{background:var(--panel2);border-left:3px solid var(--rosa-400);border-radius:8px;padding:8px 10px;cursor:pointer;transition:box-shadow .15s,transform .15s}
+  .cal-post:hover{box-shadow:0 3px 12px rgba(245,43,95,.14);transform:translateY(-1px)}
+  .cal-post .meta{font-size:10.5px;font-weight:700;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.03em}
+  .cal-post .topic{font-size:12px;line-height:1.35;color:var(--text)}
+  .cal-post.status-agendado{border-left-color:#2f6fd0}
+  .cal-post.status-publicado{border-left-color:var(--good)}
+
+  /* ---- trends ---- */
+  .trends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .trend-card{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .trend-card.urg-alta{border-left-color:var(--rosa-400)}
+  .trend-card.urg-media{border-left-color:#e0a021}
+  .trend-card.urg-baixa{border-left-color:var(--good)}
+  .trend-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .trend-termo{font-family:var(--font-serif);font-weight:700;font-size:15.5px;line-height:1.2}
+  .trend-volume{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .trend-badges{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0;justify-content:flex-end}
+  .tbadge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .tbadge.fonte{background:var(--panel2);color:var(--dim)}
+  .tbadge.tipo{background:var(--panel2);color:var(--dim)}
+  .tbadge.urg-alta{background:var(--rosa-100);color:var(--rosa-700)}
+  .tbadge.urg-media{background:#FBF0D9;color:#8a6516}
+  .tbadge.urg-baixa{background:#E2F6E2;color:#0ca30c}
+  .trend-relev{font-size:12.5px;color:var(--dim);line-height:1.5}
+  .trend-gancho{background:var(--rosa-100);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:600;font-style:italic;color:var(--rosa-700);line-height:1.4}
+  .trend-angulo{font-size:12.5px;color:var(--text);line-height:1.5}
+  .trend-actions{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap}
+  .trends-meta{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .trends-updated{font-size:12px;color:var(--muted);margin-left:auto}
+
+  /* ---- modal + designer preview ---- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(17,10,12,.55);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.visible{display:flex}
+  .modal{background:var(--panel);border-radius:20px;padding:26px 28px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 70px rgba(0,0,0,.3)}
+  .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .modal-head h3{font-size:18px}
+  .modal-head .meta{font-size:12px;color:var(--muted);margin-top:3px}
+  .modal-close{background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:var(--muted)}
+  .modal-close:hover{color:var(--text)}
+  .modal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .designer-out{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;white-space:pre-wrap;max-height:46vh;overflow-y:auto;color:var(--text)}
+  .cm-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:10px 0}
+  .spinner{width:18px;height:18px;border:2.5px solid var(--line);border-top-color:var(--rosa-400);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .toast{position:fixed;bottom:24px;right:24px;padding:13px 18px;border-radius:12px;color:#fff;font-size:13px;font-weight:600;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:340px;animation:toastIn .25s ease}
+  .toast.success{background:var(--good)}.toast.error{background:var(--bad)}.toast.info{background:var(--rosa-400)}
+  @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 
 <header>
   <div class="brand">
-    <svg width="120" height="52" viewBox="0 0 260 140" aria-label="Givo">
-      <text x="0" y="105" font-family="'Baloo 2', sans-serif" font-weight="800" font-size="108" fill="#F52B5F">giv</text>
-      <circle cx="226" cy="80" r="32" fill="#F52B5F"/>
-      <circle cx="226" cy="80" r="13" fill="#FFFFFF"/>
-      <path d="M226,50 C218,50 200,46 195,32 C192,23 200,19 209,24 C218,29 226,40 226,50 Z" fill="#F52B5F"/>
-      <path d="M226,50 C234,50 252,46 257,32 C260,23 252,19 243,24 C234,29 226,40 226,50 Z" fill="#F52B5F"/>
-      <circle cx="226" cy="49" r="5.5" fill="#F52B5F"/>
+    <svg width="128" height="58" viewBox="0 0 300 150" aria-label="Givo" role="img">
+      <text x="0" y="112" font-family="'Baloo 2', sans-serif" font-weight="800" font-size="120" letter-spacing="-3" fill="#E6326E">giv</text>
+      <circle cx="243" cy="90" r="31" fill="none" stroke="#E6326E" stroke-width="17"/>
+      <g fill="#E6326E">
+        <path d="M243,46 C230,47 205,45 199,31 C194,19 206,12 219,19 C231,26 240,35 243,46 Z"/>
+        <path d="M243,46 C256,47 281,45 287,31 C292,19 280,12 267,19 C255,26 246,35 243,46 Z"/>
+        <ellipse cx="243" cy="45" rx="7.5" ry="8.5"/>
+      </g>
     </svg>
     <div>
       <h1>Dashboard Givo</h1>
@@ -221,48 +290,144 @@
 
 <!-- ===================== MÁQUINA DE CONTEÚDOS ===================== -->
 <section id="tab-content" class="tabpanel" role="tabpanel" hidden>
-  <div class="cm-form">
-    <div class="cm-row">
-      <div class="field">
-        <label for="cmFormato">Formato</label>
-        <select id="cmFormato">
-          <option value="Carrossel">Carrossel</option>
-          <option value="Post único">Post único</option>
-          <option value="Reels">Reels</option>
-          <option value="Sequência de Stories">Sequência de Stories</option>
-          <option value="Anúncio Meta Ads">Anúncio Meta Ads</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="cmPilar">Pilar</label>
-        <select id="cmPilar">
-          <option value="auto">Automático (segue a proporção 70/20/10)</option>
-          <option value="dor operacional">Dor operacional</option>
-          <option value="prova social / autoridade">Prova social / autoridade</option>
-          <option value="institucional / conversão">Institucional / conversão</option>
-        </select>
-      </div>
-      <div class="field" style="display:flex;align-items:flex-end">
-        <label class="checkfield"><input type="checkbox" id="cmParaAnuncio"> Também será usado como anúncio (Meta Ads)</label>
+
+  <!-- ---------- DOBRA 1 — Gerador ---------- -->
+  <div class="fold">
+    <div class="fold-head">
+      <span class="fold-num">1</span>
+      <div>
+        <h2>Gerador de conteúdo</h2>
+        <p>Crie um conteúdo pronto para uso, no tom e na estratégia da Givo.</p>
       </div>
     </div>
-    <div class="cm-row" style="grid-template-columns:1fr">
-      <div class="field">
-        <label for="cmTema">Tema ou briefing (opcional)</label>
-        <textarea id="cmTema" placeholder="Ex.: gancho sobre onboarding de colaborador remoto que chega atrasado"></textarea>
+    <div class="cm-form">
+      <div class="cm-row">
+        <div class="field">
+          <label for="cmFormato">Formato</label>
+          <select id="cmFormato">
+            <option value="Carrossel">Carrossel</option>
+            <option value="Post único">Post único</option>
+            <option value="Reels">Reels</option>
+            <option value="Sequência de Stories">Sequência de Stories</option>
+            <option value="Anúncio Meta Ads">Anúncio Meta Ads</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cmPilar">Pilar</label>
+          <select id="cmPilar">
+            <option value="auto">Automático (segue a proporção 70/20/10)</option>
+            <option value="dor operacional">Dor operacional</option>
+            <option value="prova social / autoridade">Prova social / autoridade</option>
+            <option value="institucional / conversão">Institucional / conversão</option>
+          </select>
+        </div>
+        <div class="field" style="display:flex;align-items:flex-end">
+          <label class="checkfield"><input type="checkbox" id="cmParaAnuncio"> Também será usado como anúncio (Meta Ads)</label>
+        </div>
+      </div>
+      <div class="cm-row" style="grid-template-columns:1fr">
+        <div class="field">
+          <label for="cmTema">Tema ou briefing (opcional)</label>
+          <textarea id="cmTema" placeholder="Ex.: gancho sobre onboarding de colaborador remoto que chega atrasado"></textarea>
+        </div>
+      </div>
+      <div class="cm-actions">
+        <button class="btn-primary" id="cmGenerate">Gerar conteúdo</button>
+        <span class="cm-hint" id="cmHint">Conteúdo alinhado à estratégia e à identidade da Givo.</span>
       </div>
     </div>
-    <div class="cm-actions">
-      <button class="btn-primary" id="cmGenerate">Gerar conteúdo</button>
-      <span class="cm-hint" id="cmHint">Segue o Prompt Mestre da Givo e usa os anúncios de melhor desempenho dos últimos 30 dias como inspiração.</span>
+
+    <div class="cm-output" id="cmOutputWrap">
+      <div class="cm-badge" id="cmBadge"></div>
+      <div id="cmOutput" class="empty">Escolha o formato e clique em "Gerar conteúdo" para receber uma sugestão pronta para uso.</div>
+      <div class="cm-actions" id="cmExportRow" style="display:none;margin-top:18px">
+        <button class="btn-secondary btn-sm" id="cmExportDesigner">📄 Exportar para Designer</button>
+        <span class="cm-hint">Gera o conteúdo estruturado slide a slide, pronto para o designer.</span>
+      </div>
     </div>
   </div>
 
-  <div class="cm-output" id="cmOutputWrap">
-    <div class="cm-badge" id="cmBadge"></div>
-    <div id="cmOutput" class="empty">Escolha o formato e clique em "Gerar conteúdo" para receber uma sugestão pronta, seguindo o Prompt Mestre da Givo.</div>
+  <!-- ---------- DOBRA 2 — Calendário Editorial ---------- -->
+  <div class="fold">
+    <div class="fold-head">
+      <span class="fold-num">2</span>
+      <div>
+        <h2>Calendário Editorial</h2>
+        <p>Planeje a semana de posts e exporte cada tema aprovado para o designer.</p>
+      </div>
+    </div>
+    <div class="cm-form">
+      <div class="cal-controls">
+        <div class="field">
+          <label for="calWeekStart">Semana a partir de</label>
+          <input type="date" id="calWeekStart">
+        </div>
+        <div class="field" style="width:150px">
+          <label for="calPostsPerDay">Posts por dia</label>
+          <select id="calPostsPerDay">
+            <option value="1">1 por dia</option>
+            <option value="2">2 por dia</option>
+            <option value="3">3 por dia</option>
+          </select>
+        </div>
+        <button class="btn-primary" id="calGenerate">✨ Gerar semana</button>
+        <button class="btn-secondary" id="calExport" disabled title="Gere uma semana primeiro">📄 Exportar para Designer</button>
+      </div>
+    </div>
+
+    <div class="cm-output" id="calWrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+        <h3 id="calTitle" style="font-family:var(--font-sans);font-size:14px;color:var(--dim);font-weight:700">Semana</h3>
+        <div class="cal-legend">
+          <span class="badge badge-pendente">⌛ Pendente</span>
+          <span class="badge" style="background:#DBEAFE;color:#1e40af">📅 Agendado</span>
+          <span class="badge badge-concluido">✅ Publicado</span>
+        </div>
+      </div>
+      <div class="cal-week-grid" id="calGrid"></div>
+      <div id="calEmpty" class="empty">Escolha a semana e clique em "Gerar semana" para montar o calendário.</div>
+      <p id="calStatus" style="font-size:12.5px;margin-top:10px;font-weight:600"></p>
+    </div>
+  </div>
+
+  <!-- ---------- DOBRA 3 — Tendências ---------- -->
+  <div class="fold">
+    <div class="fold-head">
+      <span class="fold-num">3</span>
+      <div>
+        <h2>📡 Tendências do nicho</h2>
+        <p>O que está em alta no universo de RH, People e Employer Branding — já traduzido em pauta.</p>
+      </div>
+    </div>
+    <div class="trends-meta">
+      <span class="srcbadge" id="trendsPill">Nicho RH</span>
+      <span class="trends-updated" id="trendsUpdated"></span>
+      <button class="btn-secondary btn-sm" id="trendsRefresh">🔄 Atualizar</button>
+    </div>
+    <div class="trends-grid" id="trendsGrid"></div>
+    <div id="trendsEmpty" class="empty">Carregando tendências…</div>
+    <p id="trendsStatus" style="font-size:12.5px;margin-top:10px;font-weight:600"></p>
   </div>
 </section>
+
+<!-- ---------- Designer export modal ---------- -->
+<div class="modal-overlay" id="designerModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="designerTitle">Exportar para Designer</h3>
+        <div class="meta" id="designerMeta"></div>
+      </div>
+      <button class="modal-close" id="designerClose" aria-label="Fechar">×</button>
+    </div>
+    <div id="designerLoading" class="cm-loading"><span class="spinner"></span> Gerando conteúdo para o designer…</div>
+    <div class="designer-out" id="designerOut" hidden></div>
+    <div class="modal-actions" id="designerActions" hidden>
+      <button class="btn-primary" id="designerCopy">📋 Copiar</button>
+      <button class="btn-secondary" id="designerDownload">⬇️ Baixar .txt</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===================== PENDÊNCIAS E INSIGHTS ===================== -->
 <section id="tab-pendencias" class="tabpanel" role="tabpanel" hidden>
@@ -273,7 +438,7 @@
     <div class="channel-head">
       <div>
         <h2>Pendências e Insights</h2>
-        <p>Alimentado pela planilha "GIVO - Pendências e Insights"</p>
+        <p>Acompanhamento das pendências e insights da operação.</p>
       </div>
       <span class="srcbadge">Google Sheets</span>
     </div>
@@ -283,7 +448,7 @@
     </table></div>
     <p id="pendStatus"></p>
     <footer id="pendLastUpdate"></footer>
-    <p class="sheet-note">A aba "Página1" da planilha deve ter as colunas exatamente nesta ordem: <strong>Data, Categoria, Descrição, Status, Prioridade, Responsável, Atualização</strong>. Status aceitos: Pendente, Em andamento, Concluído, Bloqueado. Prioridade: Alta, Média, Baixa.</p>
+    <p class="sheet-note">Status: Pendente, Em andamento, Concluído, Bloqueado. Prioridade: Alta, Média, Baixa.</p>
   </section>
 </section>
 
@@ -476,7 +641,7 @@ async function refreshGoogle(){
 
 // ===================== TABS =====================
 const panels = { performance:$('tab-performance'), content:$('tab-content'), pendencias:$('tab-pendencias') };
-let pendLoaded=false, pendTimer=null;
+let pendLoaded=false, pendTimer=null, contentLoaded=false;
 document.querySelectorAll('.tabbtn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tabbtn').forEach(b=>b.setAttribute('aria-selected', b===btn?'true':'false'));
@@ -486,8 +651,20 @@ document.querySelectorAll('.tabbtn').forEach(btn=>{
       refreshPendencias();
       pendTimer=setInterval(refreshPendencias, REFRESH_MS);
     }
+    if(btn.dataset.tab==='content' && !contentLoaded){
+      contentLoaded=true;
+      initContentTab();
+    }
   });
 });
+
+// ===================== TOAST =====================
+function toast(msg,type='info'){
+  const t=document.createElement('div');
+  t.className='toast '+type; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); }, 3200);
+}
 
 // ===================== MÁQUINA DE CONTEÚDOS =====================
 const CM_HISTORY_KEY='givo_cm_historico';
@@ -509,8 +686,9 @@ $('cmGenerate').addEventListener('click', async ()=>{
 
   btn.disabled=true; btn.textContent='Gerando…';
   $('cmOutput').className='empty';
-  $('cmOutput').textContent='Consultando o Prompt Mestre da Givo e os dados do Meta Ads…';
+  $('cmOutput').textContent='Preparando seu conteúdo…';
   $('cmBadge').textContent='';
+  $('cmExportRow').style.display='none';
 
   try{
     const r=await fetch('/api/generate-content',{
@@ -524,15 +702,22 @@ $('cmGenerate').addEventListener('click', async ()=>{
     $('cmOutput').className='';
     $('cmOutput').innerHTML = marked.parse(data.content||'');
     $('cmBadge').textContent = data.usedMetaContext
-      ? 'Gerado com base no Prompt Mestre da Givo + desempenho real dos anúncios (últimos 30 dias).'
-      : 'Gerado com base no Prompt Mestre da Givo.';
+      ? 'Conteúdo gerado para a Givo, calibrado pelo desempenho real das campanhas.'
+      : 'Conteúdo gerado para a Givo.';
     cmPushHistorico(tema && tema.trim() ? tema.trim() : `${formato} — ${pilarSel}`);
+    cmLastGen = { topic: (tema && tema.trim()) ? tema.trim() : `${formato} — ${pilarSel}`, formato, hook:'' };
+    $('cmExportRow').style.display='flex';
   }catch(e){
     $('cmOutput').className='empty';
     $('cmOutput').textContent='Erro: '+e.message;
   }finally{
     btn.disabled=false; btn.textContent='Gerar conteúdo';
   }
+});
+
+// ---- exportar o conteúdo gerado para o designer ----
+$('cmExportDesigner').addEventListener('click', ()=>{
+  if(cmLastGen) openDesignerExport(cmLastGen.topic, cmLastGen.formato, cmLastGen.hook);
 });
 
 // ===================== PENDÊNCIAS E INSIGHTS =====================
@@ -592,6 +777,264 @@ async function refreshPendencias(){
     setPendStatus('Erro: '+e.message,'err');
   }
 }
+
+// ===================== CONTEÚDO: estado + init =====================
+let cmLastGen=null;
+let calData=null; // { weekStart, week:[...] }
+
+function initContentTab(){
+  // define a próxima segunda-feira como início padrão da semana
+  const now=new Date();
+  const day=now.getDay(); // 0=dom
+  const diff=(day===1)?0:((8-day)%7||7); // dias até a próxima segunda
+  const monday=new Date(now.getTime()+diff*86400000);
+  $('calWeekStart').value=toISO(monday);
+  loadTrends(false);
+}
+
+// ===================== CALENDÁRIO EDITORIAL =====================
+const DOW_LABEL=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+function setCalStatus(msg,cls){const s=$('calStatus');s.textContent=msg;s.className='';s.style.color=cls==='err'?'var(--bad)':'var(--muted)';}
+
+$('calGenerate').addEventListener('click', async ()=>{
+  const weekStart=$('calWeekStart').value;
+  if(!weekStart){ toast('Escolha a data de início da semana','error'); return; }
+  const postsPerDay=parseInt($('calPostsPerDay').value,10);
+  const btn=$('calGenerate');
+  btn.disabled=true; btn.textContent='Gerando…';
+  $('calEmpty').style.display='block'; $('calEmpty').className='empty'; $('calEmpty').textContent='Montando o calendário…';
+  $('calGrid').innerHTML='';
+  setCalStatus('','');
+  try{
+    const r=await fetch('/api/generate-calendar',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({weekStart,postsPerDay}),
+    });
+    const data=await r.json();
+    if(data.error) throw new Error(data.error);
+    calData={weekStart, week:data.week||[]};
+    renderCalendar(calData);
+    $('calExport').disabled=false; $('calExport').title='Exporta a semana para o designer';
+    toast('Semana gerada!','success');
+  }catch(e){
+    $('calEmpty').textContent='Erro: '+e.message;
+    setCalStatus('Erro: '+e.message,'err');
+  }finally{
+    btn.disabled=false; btn.textContent='✨ Gerar semana';
+  }
+});
+
+function renderCalendar(cal){
+  $('calTitle').textContent='Semana de '+cal.weekStart;
+  $('calEmpty').style.display='none';
+  const grid=$('calGrid');
+  grid.innerHTML=cal.week.map((day,di)=>{
+    const posts=day.posts||[];
+    const dow=day.dayOfWeek||DOW_LABEL[new Date(day.date+'T00:00:00').getDay()];
+    const chips=posts.map((p,pi)=>{
+      const st=(p.status||'pendente').toLowerCase();
+      const cls=st.includes('public')?'status-publicado':(st.includes('agend')?'status-agendado':'');
+      return `<div class="cal-post ${cls}" data-d="${di}" data-p="${pi}">
+        <div class="meta">${p.time||''} · ${p.type||''}</div>
+        <div class="topic">${escapeHtml(p.topic||'')}</div>
+      </div>`;
+    }).join('') || '<div style="font-size:11px;color:var(--muted)">—</div>';
+    return `<div class="cal-daycol">
+      <div class="cal-dayhead">${dow}<span>${day.date||''}</span></div>
+      ${chips}
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.cal-post').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const p=cal.week[+el.dataset.d].posts[+el.dataset.p];
+      openCalPost(p);
+    });
+  });
+}
+
+function openCalPost(post){
+  openDesignerExport(post.topic, post.type, post.hook||'', post);
+}
+
+// Exporta a SEMANA inteira num único arquivo para o designer
+$('calExport').addEventListener('click', async ()=>{
+  if(!calData){ toast('Gere uma semana primeiro','error'); return; }
+  const btn=$('calExport');
+  btn.disabled=true; btn.textContent='Gerando…';
+  toast('Montando os conteúdos da semana…','info');
+  try{
+    const blocks=[];
+    blocks.push('════════════════════════════════════════');
+    blocks.push('  CALENDÁRIO EDITORIAL — GIVO');
+    blocks.push('  Semana de '+calData.weekStart);
+    blocks.push('════════════════════════════════════════');
+    blocks.push('');
+    for(const day of calData.week){
+      const posts=day.posts||[];
+      if(!posts.length) continue;
+      const dow=day.dayOfWeek||DOW_LABEL[new Date(day.date+'T00:00:00').getDay()];
+      blocks.push('────────────────────────────────────────');
+      blocks.push(`  ${dow} · ${day.date||''}`);
+      blocks.push('────────────────────────────────────────');
+      for(let pi=0;pi<posts.length;pi++){
+        const p=posts[pi];
+        blocks.push('');
+        blocks.push(`POST ${pi+1} — ${(p.type||'Post').toUpperCase()} · ${p.time||'–'}`);
+        blocks.push(`Tema: ${p.topic||'–'}`);
+        if(p.hook) blocks.push(`Gancho: ${p.hook}`);
+        const data=await fetchDesigner(p.topic, p.type, p.hook||'');
+        blocks.push('');
+        blocks.push(designerToText(data, {headerLines:false}));
+        blocks.push('');
+      }
+    }
+    blocks.push('════════════════════════════════════════');
+    blocks.push(`  Exportado em ${new Date().toLocaleDateString('pt-BR')} — Givo`);
+    blocks.push('════════════════════════════════════════');
+    downloadText(`calendario_givo_${calData.weekStart}.txt`, blocks.join('\n'));
+    toast('Exportação concluída! ✅','success');
+  }catch(e){
+    toast('Erro: '+e.message,'error');
+  }finally{
+    btn.disabled=false; btn.textContent='📄 Exportar para Designer';
+  }
+});
+
+// ===================== EXPORTAR PARA DESIGNER (modal) =====================
+async function fetchDesigner(topic, formato, hook){
+  const r=await fetch('/api/export-designer',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({topic, formato, hook}),
+  });
+  const data=await r.json();
+  if(data.error) throw new Error(data.error);
+  return data;
+}
+
+function designerToText(data, opts){
+  const o=opts||{};
+  const slides=data.slides||[];
+  const lines=[];
+  if(o.headerLines!==false){
+    lines.push('════════════════════════════════════════');
+    lines.push('  '+(data.title||'').toUpperCase());
+    lines.push('  '+new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}));
+    lines.push('  '+slides.length+' slides');
+    lines.push('════════════════════════════════════════');
+    lines.push('');
+  }
+  slides.forEach((s,i)=>{
+    lines.push('────────────────────────────────────────');
+    lines.push(`SLIDE ${i+1} — ${(s.role||'DESENVOLVIMENTO').toUpperCase()}`);
+    lines.push('────────────────────────────────────────');
+    if(s.heading) lines.push(s.heading);
+    if(s.body){ lines.push(''); lines.push(s.body); }
+    lines.push('');
+  });
+  if(data.legenda || (data.hashtags&&data.hashtags.length)){
+    lines.push('════════════════════════════════════════');
+    lines.push('LEGENDA + HASHTAGS');
+    lines.push('════════════════════════════════════════');
+    if(data.legenda) lines.push(data.legenda);
+    if(data.hashtags&&data.hashtags.length){ lines.push(''); lines.push(data.hashtags.join(' ')); }
+  }
+  return lines.join('\n');
+}
+
+let designerText='', designerFile='conteudo_designer.txt';
+async function openDesignerExport(topic, formato, hook){
+  $('designerModal').classList.add('visible');
+  $('designerTitle').textContent='Exportar para Designer';
+  $('designerMeta').textContent=topic;
+  $('designerLoading').style.display='flex';
+  $('designerOut').hidden=true; $('designerActions').hidden=true;
+  try{
+    const data=await fetchDesigner(topic, formato, hook);
+    designerText=designerToText(data);
+    designerFile='conteudo_'+(data.title||topic||'givo').toLowerCase().replace(/[^a-z0-9]+/g,'_').slice(0,50)+'.txt';
+    $('designerOut').textContent=designerText;
+    $('designerLoading').style.display='none';
+    $('designerOut').hidden=false; $('designerActions').hidden=false;
+  }catch(e){
+    $('designerLoading').style.display='none';
+    $('designerOut').hidden=false; $('designerOut').textContent='Erro: '+e.message;
+  }
+}
+$('designerClose').addEventListener('click', ()=>$('designerModal').classList.remove('visible'));
+$('designerModal').addEventListener('click', e=>{ if(e.target===$('designerModal')) $('designerModal').classList.remove('visible'); });
+$('designerCopy').addEventListener('click', ()=>{ navigator.clipboard.writeText(designerText).then(()=>toast('Copiado!','success')); });
+$('designerDownload').addEventListener('click', ()=>{ downloadText(designerFile, designerText); });
+
+function downloadText(name, text){
+  const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// ===================== TENDÊNCIAS =====================
+async function loadTrends(refresh){
+  const grid=$('trendsGrid');
+  $('trendsEmpty').style.display='block'; $('trendsEmpty').textContent='Carregando tendências…';
+  $('trendsStatus').textContent='';
+  if(refresh){ const b=$('trendsRefresh'); b.disabled=true; b.textContent='Atualizando…'; }
+  try{
+    const r=await fetch('/api/trends'+(refresh?'?refresh=true':''));
+    const data=await r.json();
+    if(data.error) throw new Error(data.error);
+    const trends=data.trends||[];
+    if(!trends.length){ $('trendsEmpty').textContent='Nenhuma tendência disponível.'; grid.innerHTML=''; return; }
+    $('trendsEmpty').style.display='none';
+    grid.innerHTML=trends.map(t=>trendCard(t)).join('');
+    grid.querySelectorAll('[data-usar]').forEach(el=>el.addEventListener('click',()=>usarComoPauta(JSON.parse(el.dataset.usar))));
+    grid.querySelectorAll('[data-gancho]').forEach(el=>el.addEventListener('click',()=>{ navigator.clipboard.writeText(el.dataset.gancho).then(()=>toast('Gancho copiado!','success')); }));
+    if(data.updatedAt){ const dt=new Date(data.updatedAt); $('trendsUpdated').textContent='Atualizado às '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+  }catch(e){
+    $('trendsEmpty').style.display='block'; $('trendsEmpty').textContent='Erro ao carregar tendências.';
+    $('trendsStatus').textContent='Erro: '+e.message; $('trendsStatus').style.color='var(--bad)';
+  }finally{
+    const b=$('trendsRefresh'); b.disabled=false; b.textContent='🔄 Atualizar';
+  }
+}
+
+function trendCard(t){
+  const urg=(t.urgencia||'').toLowerCase();
+  const urgLabel={alta:'🔥 Alta',media:'⚡ Média',baixa:'🌱 Baixa'}[urg]||t.urgencia||'';
+  const tipoIcon={carrossel:'🎠',post:'🖼️',reels:'🎬'}[(t.tipo_ideal||'').toLowerCase()]||'📄';
+  return `<div class="trend-card urg-${urg}">
+    <div class="trend-top">
+      <div>
+        <div class="trend-termo">${escapeHtml(t.termo||'')}</div>
+        ${t.volume?`<div class="trend-volume">${escapeHtml(t.volume)}</div>`:''}
+      </div>
+      <div class="trend-badges">
+        <span class="tbadge fonte">${escapeHtml(t.fonte||'Nicho RH')}</span>
+        <span class="tbadge urg-${urg}">${urgLabel}</span>
+        <span class="tbadge tipo">${tipoIcon} ${escapeHtml(t.tipo_ideal||'')}</span>
+      </div>
+    </div>
+    ${t.relevancia?`<div class="trend-relev">${escapeHtml(t.relevancia)}</div>`:''}
+    ${t.gancho?`<div class="trend-gancho">"${escapeHtml(t.gancho)}"</div>`:''}
+    ${t.angulo?`<div class="trend-angulo">${escapeHtml(t.angulo)}</div>`:''}
+    <div class="trend-actions">
+      <button class="btn-primary btn-sm" data-usar='${escapeHtml(JSON.stringify(t))}'>✏️ Usar como pauta</button>
+      <button class="btn-secondary btn-sm" data-gancho="${escapeHtml(t.gancho||t.termo||'')}">📋 Copiar gancho</button>
+    </div>
+  </div>`;
+}
+
+function usarComoPauta(t){
+  const fmtMap={carrossel:'Carrossel',post:'Post único',reels:'Reels'};
+  const fmt=fmtMap[(t.tipo_ideal||'').toLowerCase()];
+  if(fmt) $('cmFormato').value=fmt;
+  $('cmTema').value=t.gancho||t.termo||'';
+  document.querySelector('.fold').scrollIntoView({behavior:'smooth',block:'start'});
+  $('cmTema').focus();
+  toast('Pauta enviada para o gerador de conteúdo','info');
+}
+
+$('trendsRefresh').addEventListener('click', ()=>loadTrends(true));
 
 applyPreset('7');
 </script>
