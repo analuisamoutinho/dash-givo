@@ -28,7 +28,7 @@
  *    no campo "ID da Google Sheet".
  */
 
-var SHEET_URL = 'COLE_AQUI_A_URL_COMPLETA_DA_SUA_GOOGLE_SHEET';
+var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1qvfv-8_WsWyidyyvige4Nd8BILIXFgSE82MtrtM-Uoo/edit?usp=sharing';
 
 function main() {
   if (SHEET_URL.indexOf('COLE_AQUI') !== -1) {
