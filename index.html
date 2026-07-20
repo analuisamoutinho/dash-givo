@@ -167,6 +167,21 @@
   .trends-meta{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
   .trends-updated{font-size:12px;color:var(--muted);margin-left:auto}
 
+  /* ---- reunião de alinhamento ---- */
+  .meeting-sub{font-size:12.5px;color:var(--muted);margin-bottom:20px}
+  .attention-box{background:#FBF0D9;border:1px solid #EEDBAC;border-left:4px solid #c78a1f;color:#6b4f10;border-radius:14px;padding:16px 20px;font-size:13.5px;line-height:1.6;margin-bottom:22px}
+  .attention-box strong{color:#8a6516}
+  .attention-box .att-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;color:#8a6516}
+  .agenda-list{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .agenda-item{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:14px;background:var(--panel2)}
+  .agenda-tag{flex:0 0 auto;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px;border-radius:20px;white-space:nowrap;margin-top:1px}
+  .tag-givo{background:var(--rosa-100);color:var(--rosa-700)}
+  .tag-agencia{background:#DBEAFE;color:#1e40af}
+  .agenda-body strong{display:block;font-size:14px;margin-bottom:3px}
+  .agenda-body span{font-size:13px;color:var(--dim);line-height:1.55}
+  .bar-bg{background:var(--line);border-radius:3px;height:6px;width:100%;overflow:hidden;margin-top:5px}
+  .bar-fill{height:100%;border-radius:3px;background:var(--rosa-400)}
+
   /* ---- modal + designer preview ---- */
   .modal-overlay{position:fixed;inset:0;background:rgba(17,10,12,.55);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
   .modal-overlay.visible{display:flex}
@@ -210,6 +225,7 @@
   <button class="tabbtn" role="tab" data-tab="performance" aria-selected="true">Dashboard de Performance</button>
   <button class="tabbtn" role="tab" data-tab="content" aria-selected="false">Máquina de Conteúdos</button>
   <button class="tabbtn" role="tab" data-tab="pendencias" aria-selected="false">Pendências e Insights</button>
+  <button class="tabbtn" role="tab" data-tab="reuniao" aria-selected="false">Reunião de Alinhamento</button>
 </nav>
 
 <section id="tab-performance" class="tabpanel" role="tabpanel">
@@ -455,6 +471,103 @@
   </section>
 </section>
 
+<!-- ===================== REUNIÃO DE ALINHAMENTO ===================== -->
+<section id="tab-reuniao" class="tabpanel" role="tabpanel" hidden>
+
+  <div class="meeting-sub">Período: 25 de junho a 20 de julho de 2026 · Conta Givo</div>
+
+  <!-- Resumo Meta Ads -->
+  <section class="channel">
+    <div class="channel-head">
+      <div>
+        <h2>Meta Ads</h2>
+        <p>Resumo do período para a reunião</p>
+      </div>
+      <span class="srcbadge">Meta Ads</span>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="lbl">Investimento</div><div class="num">R$ 409,49</div></div>
+      <div class="card"><div class="lbl">Impressões</div><div class="num">134,3 mil</div></div>
+      <div class="card"><div class="lbl">Cliques</div><div class="num">2.421</div></div>
+      <div class="card"><div class="lbl">CTR médio</div><div class="num">1,80%</div></div>
+      <div class="card"><div class="lbl">CPC médio</div><div class="num">R$ 0,17</div></div>
+      <div class="card"><div class="lbl">CPM médio</div><div class="num">R$ 3,05</div></div>
+    </div>
+
+    <div class="split" style="margin-bottom:0">
+      <div class="panel"><h3>Investimento × Cliques por dia (25/06 – 20/07)</h3><canvas id="mtgTrend" height="200" role="img" aria-label="Gráfico de investimento e cliques por dia no período da reunião"></canvas></div>
+      <div class="panel">
+        <h3>Investimento por campanha — total do período</h3>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Campanha</th><th class="num">Invest.</th><th class="num">Impressões</th><th class="num">Cliques</th><th class="num">CTR</th><th class="num">CPC</th></tr></thead>
+          <tbody id="mtgCampaigns"></tbody>
+        </table></div>
+        <footer style="margin-top:12px;color:var(--muted);font-size:11.5px">Dados via Windsor.ai (Meta Ads). Campanha de aquecimento rodou só em 25/06; conversão e visitas ao perfil ficaram ativas o resto do período.</footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resumo Google Ads -->
+  <section class="channel">
+    <div class="channel-head">
+      <div>
+        <h2>Google Ads</h2>
+        <p>Resumo do período para a reunião</p>
+      </div>
+      <span class="srcbadge">Google Ads</span>
+    </div>
+    <div class="grid" style="margin-bottom:10px">
+      <div class="card"><div class="lbl">Investimento</div><div class="num">R$ 380,92</div></div>
+      <div class="card"><div class="lbl">Impressões</div><div class="num">1.478</div></div>
+      <div class="card"><div class="lbl">Cliques</div><div class="num">96</div></div>
+      <div class="card"><div class="lbl">CTR médio</div><div class="num">6,50%</div></div>
+      <div class="card"><div class="lbl">CPC médio</div><div class="num">R$ 3,97</div></div>
+      <div class="card"><div class="lbl">Conversões</div><div class="num">1</div></div>
+    </div>
+    <footer style="color:var(--muted);font-size:11.5px">Campanha ativa: "[Search] Givo - Gifting Corporativo" · dados de 02/07 a 14/07 (sem atividade registrada fora dessas datas).</footer>
+  </section>
+
+  <!-- Ponto de atenção -->
+  <div class="attention-box">
+    <div class="att-title">⚠️ Ponto de atenção para a reunião</div>
+    Juntando os dois canais, foram investidos <strong>R$ 790,41</strong> no período e apenas <strong>1 conversão registrada</strong> (no Google Ads, dia 09/07 — no Meta, zero). Tráfego está entrando bem no site (134 mil impressões + 1.478 no Google, 2.517 cliques somados), mas quase não converte. Isso reforça o ponto do raio-x (Hotjar): sem visibilidade do comportamento no site não dá pra saber se é problema de oferta, UX ou tracking mal configurado.
+  </div>
+
+  <!-- Pauta -->
+  <section class="channel" style="margin-bottom:0">
+    <div class="channel-head">
+      <div>
+        <h2>Pauta de alinhamento</h2>
+        <p>Pontos para a reunião</p>
+      </div>
+    </div>
+    <ul class="agenda-list">
+      <li class="agenda-item">
+        <span class="agenda-tag tag-givo">Givo</span>
+        <div class="agenda-body">
+          <strong>Ferramenta de raio-x do site (ex: Hotjar)</strong>
+          <span>Tráfego está trazendo bastante gente para o site, mas sem conversão registrada no período (0 leads/compras, só 37 visualizações de LP). Precisamos entender onde as pessoas estão travando — pedido já feito à Givo, reforçar prazo de instalação.</span>
+        </div>
+      </li>
+      <li class="agenda-item">
+        <span class="agenda-tag tag-agencia">Agência</span>
+        <div class="agenda-body">
+          <strong>Mudança temporária de objetivo para Mensagens</strong>
+          <span>Enquanto o raio-x não é instalado, vamos migrar a campanha principal para objetivo de Mensagens, tentando converter em conversa direta quem já está sendo impactado/visitando o site.</span>
+        </div>
+      </li>
+      <li class="agenda-item">
+        <span class="agenda-tag tag-givo">Givo</span>
+        <div class="agenda-body">
+          <strong>Posts no feed do Instagram</strong>
+          <span>Responsabilidade da Givo. Agência vai enviar um prompt de apoio para ajudar na geração das imagens dos posts.</span>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+</section><!-- /tab-reuniao -->
+
 <script>
 const GOOGLE_SHEET_ID = '1qvfv-8_WsWyidyyvige4Nd8BILIXFgSE82MtrtM-Uoo';
 const PENDENCIAS_SHEET_ID = '13xIuM02qtENaIhOkz8BPmoiWARUD3ZWmu_jucd-l1f8';
@@ -643,8 +756,8 @@ async function refreshGoogle(){
 }
 
 // ===================== TABS =====================
-const panels = { performance:$('tab-performance'), content:$('tab-content'), pendencias:$('tab-pendencias') };
-let pendLoaded=false, pendTimer=null, contentLoaded=false;
+const panels = { performance:$('tab-performance'), content:$('tab-content'), pendencias:$('tab-pendencias'), reuniao:$('tab-reuniao') };
+let pendLoaded=false, pendTimer=null, contentLoaded=false, reuniaoLoaded=false;
 document.querySelectorAll('.tabbtn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tabbtn').forEach(b=>b.setAttribute('aria-selected', b===btn?'true':'false'));
@@ -658,8 +771,46 @@ document.querySelectorAll('.tabbtn').forEach(btn=>{
       contentLoaded=true;
       initContentTab();
     }
+    if(btn.dataset.tab==='reuniao' && !reuniaoLoaded){
+      reuniaoLoaded=true;
+      initReuniaoTab();
+    }
   });
 });
+
+// ===================== REUNIÃO DE ALINHAMENTO (dados fixos do período 25/06–20/07) =====================
+function initReuniaoTab(){
+  const campaigns=[
+    {name:'[TRÁFEGO] Aquecimento - LP', spend:32.00, impressions:5075, clicks:48, ctr:0.95, cpc:0.67},
+    {name:'[CONVERSÃO]', spend:174.42, impressions:38096, clicks:761, ctr:2.00, cpc:0.23},
+    {name:'[TRÁFEGO] Visitas ao Perfil', spend:203.07, impressions:91099, clicks:1612, ctr:1.77, cpc:0.13},
+  ];
+  const maxSpend=Math.max(...campaigns.map(c=>c.spend));
+  $('mtgCampaigns').innerHTML=campaigns.map(c=>`<tr>
+    <td class="name">${c.name}</td>
+    <td class="num">${brl(c.spend)}<div class="bar-bg"><div class="bar-fill" style="width:${Math.round(c.spend/maxSpend*100)}%"></div></div></td>
+    <td class="num">${int(c.impressions)}</td>
+    <td class="num">${int(c.clicks)}</td>
+    <td class="num">${pct(c.ctr)}</td>
+    <td class="num">${brl(c.cpc)}</td>
+  </tr>`).join('');
+
+  const daily=[
+    ['25/06',32,48],['30/06',6.6,45],['01/07',41.52,83],['02/07',17.98,106],
+    ['03/07',45.18,210],['04/07',38.19,267],['05/07',41.84,324],['06/07',29.28,198],
+    ['07/07',27.82,182],['08/07',9.9,95],['09/07',9.61,81],['10/07',9.73,84],
+    ['11/07',9.48,79],['12/07',11.79,112],['13/07',10.04,96],['14/07',6.28,53],
+    ['15/07',9.1,33],['16/07',11.92,51],['17/07',9.94,21],['18/07',10.93,74],
+    ['19/07',14.96,112],['20/07',5.4,67]
+  ];
+  new Chart($('mtgTrend'),{type:'line',data:{labels:daily.map(d=>d[0]),datasets:[
+    {label:'Investido (R$)',data:daily.map(d=>d[1]),borderColor:'#F52B5F',backgroundColor:'rgba(245,43,95,.10)',borderWidth:2,pointRadius:0,fill:true,tension:.35,yAxisID:'y'},
+    {label:'Cliques',data:daily.map(d=>d[2]),borderColor:'#5B4B4E',borderDash:[4,3],borderWidth:2,pointRadius:0,tension:.35,yAxisID:'y1'}]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#5B4B4E',font:{family:'Inter'}}}},
+    scales:{x:{ticks:{color:'#8C7A7E'},grid:{color:'#EFDEE3'}},
+      y:{ticks:{color:'#F52B5F'},grid:{color:'#EFDEE3'}},
+      y1:{position:'right',ticks:{color:'#5B4B4E'},grid:{drawOnChartArea:false}}}}});
+}
 
 // ===================== TOAST =====================
 function toast(msg,type='info'){
